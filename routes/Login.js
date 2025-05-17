@@ -26,18 +26,22 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Create a new login item
 router.post('/', async (req, res) => {
   try {
     const { name, email, password, address, mobile, login } = req.body;
 
-    // Check if the email already exists
+    // Basic field validation
+    if (!name || !email || !password || !address || !mobile || !login) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // Check if email already exists
     const existingUser = await Login.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'Email already exists' });
     }
 
-    // Hash the password before saving
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const loginItem = new Login({
